@@ -1,0 +1,107 @@
+version: '3.9'
+
+services:
+  angular-ui:
+    image: naslth/k8s-istio-angular-web-service:1.0.0
+    depends_on:
+      - service-a
+    networks:
+      - golang-demo
+    ports:
+      - 80:80
+  service-a:
+    image: naslth/k8s-istio-service-a:1.0.0
+    networks:
+      - golang-demo
+    ports:
+      - 8080:8080
+    environment:
+      SERVICE_B_URL: 'http://service-b:8080'
+      SERVICE_C_URL: 'http://service-c:8080'
+  service-b:
+    image: naslth/k8s-istio-service-b:1.0.0
+    networks:
+      - golang-demo
+    environment:
+      SERVICE_D_URL: 'http://service-d:8080'
+      SERVICE_E_URL: 'http://service-e:8080'
+  service-c:
+    image: naslth/k8s-istio-service-c:1.0.0
+    depends_on:
+      - mongodb
+    networks:
+      - golang-demo
+    environment:
+      MONGO_CONN: 'mongodb://mongodb:27017/admin'
+  service-d:
+    image: naslth/k8s-istio-service-d:1.0.0
+    depends_on:
+      - rabbitmq
+    networks:
+      - golang-demo
+    environment:
+      RABBITMQ_CONN: 'amqp://guest:guest@rabbitmq:5672/'
+  service-e:
+    image: naslth/k8s-istio-service-e:1.0.0
+    networks:
+      - golang-demo
+    environment:
+      SERVICE_G_URL: 'http://service-g:8080'
+      SERVICE_H_URL: 'http://service-h:8080'
+  service-f:
+    image: naslth/k8s-istio-service-f:1.0.0
+    depends_on:
+      - rabbitmq
+      - mongodb
+    networks:
+      - golang-demo
+    environment:
+      RABBITMQ_CONN: 'amqp://guest:guest@rabbitmq:5672/'
+      MONGO_CONN: 'mongodb://mongodb:27017/admin'
+  service-g:
+    image: naslth/k8s-istio-service-g:1.0.0
+    depends_on:
+      - mongodb
+    networks:
+      - golang-demo
+    environment:
+      MONGO_CONN: 'mongodb://mongodb:27017/admin'
+  service-h:
+    image: naslth/k8s-istio-service-h:1.0.0
+    depends_on:
+      - mongodb
+    networks:
+      - golang-demo
+    environment:
+      MONGO_CONN: 'mongodb://mongodb:27017/admin'
+  mongodb:
+    image: mongo:4.4.6
+    networks:
+      - golang-demo
+    ports:
+      - 27017:27017
+  mongo_express:
+    image: mongo-express:0.54.0
+    depends_on:
+      - mongodb
+    ports:
+      - 8081:8081
+    networks:
+      - golang-demo
+    environment:
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_SERVER: 'mongodb'
+  rabbitmq:
+    image: rabbitmq:3.8.16-management-alpine
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - golang-demo
+
+networks:
+  golang-demo:
+    external: true
+
+volumes:
+  data: { }
