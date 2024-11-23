@@ -60,10 +60,6 @@ spec:
           env:
             - name: LOG_LEVEL
               value: info
-            - name: GREETING
-              value: "Howdy, from Service A!"
-            - name: ALLOWED_ORIGINS
-              value: https://demo-ui.example-api.com
             - name: SERVICE_B_URL
               value: http://service-b.dev.svc.cluster.local:8080
             - name: SERVICE_C_URL

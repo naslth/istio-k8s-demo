@@ -4,7 +4,7 @@ metadata:
   name: angular-ui
 spec:
   hosts:
-    - {{ .Values.istio.hosts.ui}}
+    - {{ .Values.istio.url }}
   gateways:
     - istio-gateway
   http:
@@ -24,7 +24,7 @@ metadata:
   name: service-a
 spec:
   hosts:
-    - {{ .Values.istio.hosts.api }}
+    - {{ .Values.istio.url }}
   gateways:
     - istio-gateway
   http:

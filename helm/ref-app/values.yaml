@@ -14,8 +14,8 @@ image:
     ServiceH: 1.0.0
 
 autoscaling:
-  minReplicas: 2
-  maxReplicas: 6
+  minReplicas: 1
+  maxReplicas: 3
 
   metrics:
     memory:
@@ -25,18 +25,14 @@ autoscaling:
 
 secrets:
   data:
-    mongodbConn: your_value_here
-    rabbitmqConn: your_value_here
+    mongodbConn: bW9uZ29kYitzcnY6Ly9uYXNsdGg6OTAxNUBrOHMtaXN0aW8tbW9uZ28uZnBmY3R6Yy5tb25nb2RiLm5ldC8/cmV0cnlXcml0ZXM9dHJ1ZSZ3PW1ham9yaXR5JmFwcE5hbWU9azhzLWlzdGlvLW1vbmdv
+    rabbitmqConn: YW1xcHM6Ly9wcGxhdWp4aDpwTjR3aTB1aGxTRkFVMmVuUzdFWlRLV2RJWE5oWmgySEBhbGJhdHJvc3Mucm1xLmNsb3VkYW1xcC5jb20vcHBsYXVqeGg=
 
 istio:
-  hosts:
-    ui: your_value_here.com
-    api: your_value_here.com
+  url: naslth.myddns.me
 
 serviceEntry:
-  documentdb:
-    hosts:
-      - your_value_here.amazonaws.com
-  amazonmq:
-    hosts:
-      - your_value_here.amazonaws.com
+  mongoatlas:
+    url: k8s-istio-mongo.fpfctzc.mongodb.net
+  rabbitmq:
+    url: albatross.rmq.cloudamqp.com
