@@ -4,14 +4,14 @@ image:
 
   tag:
     AngularUI: 1.0.0
-    ServiceA: 1.0.0
-    ServiceB: 1.0.0
-    ServiceC: 1.0.0
-    ServiceD: 1.0.0
-    ServiceE: 1.0.0
-    ServiceF: 1.0.0
-    ServiceG: 1.0.0
-    ServiceH: 1.0.0
+    ServiceA: 1.0.4
+    ServiceB: 1.0.4
+    ServiceC: 1.0.4
+    ServiceD: 1.0.4
+    ServiceE: 1.0.4
+    ServiceF: 1.0.4
+    ServiceG: 1.0.4
+    ServiceH: 1.0.4
 
 autoscaling:
   minReplicas: 1

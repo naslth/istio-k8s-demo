@@ -10,4 +10,4 @@ spec:
       number: 27017
       protocol: MONGO
   location: MESH_EXTERNAL
-  resolution: NONE
+  resolution: DNS
