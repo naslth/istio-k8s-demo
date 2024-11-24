@@ -6,15 +6,9 @@ spec:
   selector:
     istio: ingressgateway 
   servers:
-    # - port:
-    #     number: 80
-    #     name: http-gateway
-    #     protocol: HTTP
-    #   hosts:
-    #     - {{ .Values.istio.url }}
     - port:
         number: 443
-        name: https-gateway
+        name: https
         protocol: HTTPS
       tls:
         mode: SIMPLE
