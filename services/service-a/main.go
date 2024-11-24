@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	runtime "github.com/banzaicloud/logrus-runtime-formatter"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -11,6 +10,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	runtime "github.com/banzaicloud/logrus-runtime-formatter"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"

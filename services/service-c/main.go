@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"encoding/json"
-	runtime "github.com/banzaicloud/logrus-runtime-formatter"
 	"net/http"
 	"os"
 	"time"
+
+	runtime "github.com/banzaicloud/logrus-runtime-formatter"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -21,7 +22,7 @@ var (
 	port        = getEnv("PORT", ":8080")
 	serviceName = getEnv("SERVICE_NAME", "Service C")
 	message     = getEnv("GREETING", "Konnichiwa (こんにちは), from Service C!")
-	mongoConn    = getEnv("MONGO_CONN", "mongodb+srv://naslth:9015@k8s-istio-mongo.fpfctzc.mongodb.net/?retryWrites=true&w=majority&appName=k8s-istio-mongo")
+	mongoConn   = getEnv("MONGO_CONN", "mongodb://mongodb:27017/admin")
 )
 
 type Greeting struct {

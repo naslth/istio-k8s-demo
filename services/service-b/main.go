@@ -2,12 +2,13 @@ package main
 
 import (
 	"encoding/json"
-	runtime "github.com/banzaicloud/logrus-runtime-formatter"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
+
+	runtime "github.com/banzaicloud/logrus-runtime-formatter"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"

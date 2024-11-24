@@ -7,9 +7,9 @@ image:
     ServiceA: 1.0.4
     ServiceB: 1.0.4
     ServiceC: 1.0.4
-    ServiceD: 1.0.4
+    ServiceD: 1.0.5
     ServiceE: 1.0.4
-    ServiceF: 1.0.4
+    ServiceF: 1.0.5
     ServiceG: 1.0.4
     ServiceH: 1.0.4
 

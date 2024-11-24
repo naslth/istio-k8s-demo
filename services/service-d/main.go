@@ -2,16 +2,17 @@ package main
 
 import (
 	"encoding/json"
-	runtime "github.com/banzaicloud/logrus-runtime-formatter"
 	"net/http"
 	"os"
 	"time"
 
+	runtime "github.com/banzaicloud/logrus-runtime-formatter"
+
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	amqp "github.com/rabbitmq/amqp091-go"
 	log "github.com/sirupsen/logrus"
-	"github.com/streadway/amqp"
 )
 
 var (
@@ -20,7 +21,7 @@ var (
 	serviceName  = getEnv("SERVICE_NAME", "Service D")
 	message      = getEnv("GREETING", "Shalom (שָׁלוֹם), from Service D!")
 	queueName    = getEnv("QUEUE_NAME", "service-d.greeting")
-	rabbitMQConn = getEnv("RABBITMQ_CONN", "amqps://pplaujxh:pN4wi0uhlSFAU2enS7EZTKWdIXNhZh2H@albatross.rmq.cloudamqp.com/pplaujxh")
+	rabbitMQConn = getEnv("RABBITMQ_CONN", "amqp://guest:guest@rabbitmq:5672")
 )
 
 type Greeting struct {

@@ -21,7 +21,7 @@ var (
 	port        = getEnv("PORT", ":8080")
 	serviceName = getEnv("SERVICE_NAME", "Service H")
 	message     = getEnv("GREETING", "Ciao, from Service H!")
-	mongoConn    = getEnv("MONGO_CONN", "mongodb+srv://naslth:9015@k8s-istio-mongo.fpfctzc.mongodb.net/?retryWrites=true&w=majority&appName=k8s-istio-mongo")
+	mongoConn   = getEnv("MONGO_CONN", "mongodb://mongodb:27017/admin")
 )
 
 type Greeting struct {

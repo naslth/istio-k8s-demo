@@ -16,10 +16,10 @@ Install Helm Chart
 
 ```shell
 # perform dry run
-helm install ref-app ./ref-app --namespace dev --debug --dry-run
+helm install k8s-istio ./k8s-istio --namespace dev --debug --dry-run
 
 # apply chart resources
 kubectl delete namespace dev
 kubectl create namespace dev
 kubectl label namespace dev istio-injection=enabled
-helm install ref-app ./ref-app --namespace dev
+helm install k8s-istio ./k8s-istio --namespace dev
