@@ -37,45 +37,5 @@ spec:
             subset: v1
             port:
               number: 8080
----
-apiVersion: networking.istio.io/v1
-kind: VirtualService
-metadata:
-  name: mongodb-atlas
-spec:
-  hosts:
-    - {{ .Values.serviceEntry.mongoatlas.url }}
-  gateways:
-    - istio-egress-gateway
-  http:
-    - match:
-      - gateways:
-        - istio-egress-gateway
-        port: 27017
-      route:
-      - destination:
-          host: {{ .Values.serviceEntry.mongoatlas.url }}
-          port:
-            number: 27017
----
-apiVersion: networking.istio.io/v1
-kind: VirtualService
-metadata:
-  name: cloudamqp
-spec:
-  hosts:
-    - {{ .Values.serviceEntry.mongoatlas.url }}
-  gateways:
-    - istio-egress-gateway
-  http:
-    - match:
-      - gateways:
-        - istio-egress-gateway
-        port: 5672
-      route:
-      - destination:
-          host: {{ .Values.serviceEntry.rabbitmq.url }}
-          port:
-            number: 5672 
 
   
