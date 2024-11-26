@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"sync"
 
 	runtime "github.com/banzaicloud/logrus-runtime-formatter"
 
@@ -38,15 +39,14 @@ type Greeting struct {
 }
 
 var greetings []Greeting
+var wg sync.WaitGroup
 
 // *** HANDLERS ***
 
 func GreetingHandler(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
-
 	greetings = nil
-
 	tmpGreeting := Greeting{
 		ID:          uuid.New().String(),
 		ServiceName: serviceName,
@@ -54,11 +54,12 @@ func GreetingHandler(w http.ResponseWriter, _ *http.Request) {
 		CreatedAt:   time.Now().Local(),
 		Hostname:    getHostname(),
 	}
-
 	greetings = append(greetings, tmpGreeting)
+	// Call MongoDB to store the greeting asynchronously
+	wg.Add(1)
+	go callMongoDB(tmpGreeting, mongoConn)
 
-	callMongoDB(tmpGreeting, mongoConn)
-
+	// Respond with the greeting
 	err := json.NewEncoder(w).Encode(greetings)
 	if err != nil {
 		log.Error(err)
@@ -85,99 +86,96 @@ func getHostname() string {
 }
 
 func callMongoDB(greeting Greeting, mongoConn string) {
-	log.Info(greeting)
+	defer wg.Done()
+
+	log.Info("Storing greeting in MongoDB:", greeting)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoConn))
 	if err != nil {
-		log.Error(err)
+		log.Error("Failed to connect to MongoDB:", err)
+		return
+	}
+	defer client.Disconnect(ctx)
+
+	// Ping MongoDB to ensure connection is healthy
+	if err := client.Ping(ctx, nil); err != nil {
+		log.Error("MongoDB connection failed:", err)
+		return
 	}
 
-	defer func(client *mongo.Client, ctx context.Context) {
-		err := client.Disconnect(ctx)
-		if err != nil {
-			log.Error(err)
-		}
-	}(client, nil)
-
 	collection := client.Database("service-f").Collection("messages")
-	ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
 	_, err = collection.InsertOne(ctx, greeting)
 	if err != nil {
-		log.Error(err)
+		log.Error("Failed to insert greeting into MongoDB:", err)
 	}
 }
 
 func getMessages(rabbitMQConn string) {
-	conn, err := amqp.Dial(rabbitMQConn)
-	if err != nil {
-		log.Error(err)
-	}
-	defer func(conn *amqp.Connection) {
-		err := conn.Close()
+	for {
+		conn, err := amqp.Dial(rabbitMQConn)
 		if err != nil {
-			log.Error(err)
+			log.Error("Failed to connect to RabbitMQ:", err)
+			time.Sleep(5 * time.Second) // Retry after a delay
+			continue
 		}
-	}(conn)
+		defer conn.Close()
 
-	ch, err := conn.Channel()
-	if err != nil {
-		log.Error(err)
-	}
-	defer func(ch *amqp.Channel) {
-		err := ch.Close()
+		ch, err := conn.Channel()
 		if err != nil {
-			log.Error(err)
+			log.Error("Failed to create a RabbitMQ channel:", err)
+			time.Sleep(5 * time.Second) // Retry after a delay
+			continue
 		}
-	}(ch)
+		defer ch.Close()
 
-	q, err := ch.QueueDeclare(
-		queueName,
-		false,
-		false,
-		false,
-		false,
-		nil,
-	)
-	if err != nil {
-		log.Error(err)
-	}
+		q, err := ch.QueueDeclare(
+			queueName,
+			false,
+			false,
+			false,
+			false,
+			nil,
+		)
+		if err != nil {
+			log.Error("Failed to declare queue:", err)
+			time.Sleep(5 * time.Second) // Retry after a delay
+			continue
+		}
 
-	msgs, err := ch.Consume(
-		q.Name,
-		"service-f",
-		true,
-		false,
-		false,
-		false,
-		nil,
-	)
-	if err != nil {
-		log.Error(err)
-	}
+		msgs, err := ch.Consume(
+			q.Name,
+			"service-f",
+			true,
+			false,
+			false,
+			false,
+			nil,
+		)
+		if err != nil {
+			log.Error("Failed to consume messages:", err)
+			time.Sleep(5 * time.Second) // Retry after a delay
+			continue
+		}
 
-	forever := make(chan bool)
-
-	go func() {
 		for delivery := range msgs {
-			log.Debug(delivery)
-			callMongoDB(deserialize(delivery.Body), mongoConn)
+			log.Debug("Received message:", delivery.Body)
+			tmpGreeting := deserialize(delivery.Body)
+			// Call MongoDB asynchronously
+			wg.Add(1)
+			go callMongoDB(tmpGreeting, mongoConn)
 		}
-	}()
-
-	<-forever
+	}
 }
 
 func deserialize(b []byte) (t Greeting) {
-	log.Debug(b)
+	log.Debug("Deserializing message:", b)
 	var tmpGreeting Greeting
 	buf := bytes.NewBuffer(b)
 	decoder := json.NewDecoder(buf)
 	err := decoder.Decode(&tmpGreeting)
 	if err != nil {
-		log.Error(err)
+		log.Error("Failed to deserialize message:", err)
 	}
 	return tmpGreeting
 }
@@ -190,31 +188,37 @@ func getEnv(key, fallback string) string {
 }
 
 func run() error {
+	// Start receiving messages from RabbitMQ in a separate goroutine
 	go getMessages(rabbitMQConn)
 
+	// Initialize HTTP server
 	router := mux.NewRouter()
 	api := router.PathPrefix("/api").Subrouter()
 	api.HandleFunc("/greeting", GreetingHandler).Methods("GET")
 	api.HandleFunc("/health", HealthCheckHandler).Methods("GET")
 	api.Handle("/metrics", promhttp.Handler())
+
+	// Start HTTP server
 	return http.ListenAndServe(port, router)
 }
 
 func init() {
+	// Initialize log settings
 	formatter := runtime.Formatter{ChildFormatter: &log.JSONFormatter{}}
 	formatter.Line = true
 	log.SetFormatter(&formatter)
 	log.SetOutput(os.Stdout)
 	level, err := log.ParseLevel(logLevel)
 	if err != nil {
-		log.Error(err)
+		log.Error("Invalid log level:", err)
 	}
 	log.SetLevel(level)
 }
 
 func main() {
+	// Start the application and ensure graceful error handling
 	if err := run(); err != nil {
-		log.Fatal(err)
+		log.Fatal("Failed to start the server:", err)
 		os.Exit(1)
 	}
 }

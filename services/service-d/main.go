@@ -38,8 +38,8 @@ func GreetingHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 
+	// Create a new greeting message
 	greetings = nil
-
 	tmpGreeting := Greeting{
 		ID:          uuid.New().String(),
 		ServiceName: serviceName,
@@ -48,14 +48,16 @@ func GreetingHandler(w http.ResponseWriter, r *http.Request) {
 		Hostname:    getHostname(),
 	}
 
+	// Store it in the greetings slice
 	greetings = append(greetings, tmpGreeting)
 
-	err := json.NewEncoder(w).Encode(greetings)
+	// Respond with the greeting message
+	err := json.NewEncoder(w).Encode(tmpGreeting)
 	if err != nil {
-		log.Error(err)
+		log.Error("Error encoding greeting to JSON:", err)
 	}
 
-	// Headers must be passed for Jaeger Distributed Tracing
+	// Prepare headers for Jaeger tracing
 	incomingHeaders := []string{
 		"x-b3-flags",
 		"x-b3-parentspanid",
@@ -67,20 +69,23 @@ func GreetingHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rabbitHeaders := amqp.Table{}
-
 	for _, header := range incomingHeaders {
 		if r.Header.Get(header) != "" {
 			rabbitHeaders[header] = r.Header.Get(header)
 		}
 	}
 
-	log.Debug(rabbitHeaders)
+	log.Debug("Sending message with headers:", rabbitHeaders)
 
+	// Marshal the greeting for RabbitMQ
 	body, err := json.Marshal(tmpGreeting)
-	sendMessage(rabbitHeaders, body, rabbitMQConn)
 	if err != nil {
-		log.Error(err)
+		log.Error("Error marshalling greeting to JSON:", err)
+		return
 	}
+
+	// Send the message to RabbitMQ
+	sendMessage(rabbitHeaders, body, rabbitMQConn)
 }
 
 func HealthCheckHandler(w http.ResponseWriter, _ *http.Request) {
@@ -88,33 +93,32 @@ func HealthCheckHandler(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, err := w.Write([]byte("{\"alive\": true}"))
 	if err != nil {
-		log.Error(err)
+		log.Error("Error sending health check response:", err)
 	}
 }
 
 func sendMessage(headers amqp.Table, body []byte, rabbitMQConn string) {
 	conn, err := amqp.Dial(rabbitMQConn)
 	if err != nil {
-		log.Error(err)
+		log.Error("Failed to connect to RabbitMQ:", err)
+		return
 	}
-	defer func(conn *amqp.Connection) {
-		err := conn.Close()
-		if err != nil {
-			log.Error(err)
+	defer func() {
+		if err := conn.Close(); err != nil {
+			log.Error("Error closing RabbitMQ connection:", err)
 		}
-	}(conn)
+	}()
 
 	ch, err := conn.Channel()
 	if err != nil {
-		log.Error(err)
+		log.Error("Failed to open a channel:", err)
+		return
 	}
-
-	defer func(ch *amqp.Channel) {
-		err := ch.Close()
-		if err != nil {
-
+	defer func() {
+		if err := ch.Close(); err != nil {
+			log.Error("Error closing RabbitMQ channel:", err)
 		}
-	}(ch)
+	}()
 
 	q, err := ch.QueueDeclare(
 		queueName,
@@ -125,7 +129,8 @@ func sendMessage(headers amqp.Table, body []byte, rabbitMQConn string) {
 		nil,
 	)
 	if err != nil {
-		log.Error(err)
+		log.Error("Failed to declare queue:", err)
+		return
 	}
 
 	err = ch.Publish(
@@ -139,14 +144,15 @@ func sendMessage(headers amqp.Table, body []byte, rabbitMQConn string) {
 			Body:        body,
 		})
 	if err != nil {
-		log.Error(err)
+		log.Error("Failed to send message to RabbitMQ:", err)
 	}
 }
 
 func getHostname() string {
 	hostname, err := os.Hostname()
 	if err != nil {
-		log.Error(err)
+		log.Error("Error getting hostname:", err)
+		return ""
 	}
 	return hostname
 }
@@ -174,14 +180,14 @@ func init() {
 	log.SetOutput(os.Stdout)
 	level, err := log.ParseLevel(logLevel)
 	if err != nil {
-		log.Error(err)
+		log.Error("Error parsing log level:", err)
 	}
 	log.SetLevel(level)
 }
 
 func main() {
 	if err := run(); err != nil {
-		log.Fatal(err)
+		log.Fatal("Error running the server:", err)
 		os.Exit(1)
 	}
 }

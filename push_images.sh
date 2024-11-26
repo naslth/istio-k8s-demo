@@ -1,7 +1,7 @@
 #!/bin/bash
 
-readonly -a arr=(a b c d e f g h)
-readonly tag=1.0.6
+readonly -a arr=(f)
+readonly tag=1.0.9
 
 for i in "${arr[@]}"
 do

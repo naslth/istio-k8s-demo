@@ -1,8 +1,8 @@
 #!/bin/bash
 # purpose: Build Go microservices for demo
 
-readonly -a arr=(a b c d e f g h)
-readonly tag=1.0.6
+readonly -a arr=(f)
+readonly tag=1.1.0
 
 for i in "${arr[@]}"
 do

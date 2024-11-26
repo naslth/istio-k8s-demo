@@ -6,10 +6,10 @@ image:
     AngularUI: 1.0.0
     ServiceA: 1.0.6
     ServiceB: 1.0.6
-    ServiceC: 1.0.6
-    ServiceD: 1.0.6
+    ServiceC: 1.0.9
+    ServiceD: 1.0.9
     ServiceE: 1.0.6
-    ServiceF: 1.0.6
+    ServiceF: 1.0.9
     ServiceG: 1.0.6
     ServiceH: 1.0.6
 
@@ -26,7 +26,7 @@ autoscaling:
 secrets:
   data:
     mongodbConn: bW9uZ29kYitzcnY6Ly9uYXNsdGg6OTAxNUBrOHMtaXN0aW8tbW9uZ28uZnBmY3R6Yy5tb25nb2RiLm5ldC8/cmV0cnlXcml0ZXM9dHJ1ZSZ3PW1ham9yaXR5JmFwcE5hbWU9azhzLWlzdGlvLW1vbmdv
-    rabbitmqConn: YW1xcHM6Ly9wcGxhdWp4aDpwTjR3aTB1aGxTRkFVMmVuUzdFWlRLV2RJWE5oWmgySEBhbGJhdHJvc3Mucm1xLmNsb3VkYW1xcC5jb20vcHBsYXVqeGg=
+    rabbitmqConn: YW1xcDovL3BwbGF1anhoOnBONHdpMHVobFNGQVUyZW5TN0VaVEtXZElYTmhaaDJIQGFsYmF0cm9zcy5ybXEuY2xvdWRhbXFwLmNvbS9wcGxhdWp4aA==
 
 istio:
   url: naslth.myddns.me

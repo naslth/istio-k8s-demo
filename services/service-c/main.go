@@ -92,13 +92,6 @@ func callMongoDB(greeting Greeting, mongoConn string) {
 	if err != nil {
 		log.Error(err)
 	}
-
-	defer func(client *mongo.Client, ctx context.Context) {
-		err := client.Disconnect(ctx)
-		if err != nil {
-			log.Error(err)
-		}
-	}(client, ctx)
 }
 
 func getHostname() string {

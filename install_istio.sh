@@ -4,9 +4,9 @@
 # helm repo list
 
 # install helm
-helm install istio-base istio/base -n istio-system meshConfig.outboundTrafficPolicy.mode=ALLOW_ANY --set meshConfig.defaultConfig.proxyMetadata.ISTIO_META_DNS_CAPTURE="true" --set meshConfig.defaultConfig.proxyMetadata.ISTIO_META_DNS_AUTO_ALLOCATE="true"
-helm install istiod istio/istiod -n istio-system --wait meshConfig.outboundTrafficPolicy.mode=ALLOW_ANY --set meshConfig.defaultConfig.proxyMetadata.ISTIO_META_DNS_CAPTURE="true" --set meshConfig.defaultConfig.proxyMetadata.ISTIO_META_DNS_AUTO_ALLOCATE="true"
-helm install istio-ingressgateway istio/gateway -n istio-system meshConfig.outboundTrafficPolicy.mode=ALLOW_ANY --set meshConfig.defaultConfig.proxyMetadata.ISTIO_META_DNS_CAPTURE="true" --set meshConfig.defaultConfig.proxyMetadata.ISTIO_META_DNS_AUTO_ALLOCATE="true"
+helm install istio-base istio/base -n istio-system --set meshConfig.outboundTrafficPolicy.mode=ALLOW_ANY --set meshConfig.defaultConfig.proxyMetadata.ISTIO_META_DNS_CAPTURE="true" --set meshConfig.defaultConfig.proxyMetadata.ISTIO_META_DNS_AUTO_ALLOCATE="true"
+helm install istiod istio/istiod -n istio-system --wait --set meshConfig.outboundTrafficPolicy.mode=ALLOW_ANY --set meshConfig.defaultConfig.proxyMetadata.ISTIO_META_DNS_CAPTURE="true" --set meshConfig.defaultConfig.proxyMetadata.ISTIO_META_DNS_AUTO_ALLOCATE="true"
+helm install istio-ingressgateway istio/gateway -n istio-system --set meshConfig.outboundTrafficPolicy.mode=ALLOW_ANY --set meshConfig.defaultConfig.proxyMetadata.ISTIO_META_DNS_CAPTURE="true" --set meshConfig.defaultConfig.proxyMetadata.ISTIO_META_DNS_AUTO_ALLOCATE="true"
 
 #check istio
 kubectl get svc -n istio-system

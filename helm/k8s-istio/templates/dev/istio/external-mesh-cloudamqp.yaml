@@ -7,7 +7,7 @@ spec:
     - {{ .Values.serviceEntry.rabbitmq.url }}
   ports:
     - name: rabbitmq
-      number: 5671
+      number: 5672
       protocol: TCP
   addresses:
     - 35.208.52.147
