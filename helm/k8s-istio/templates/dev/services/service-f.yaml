@@ -36,6 +36,9 @@ spec:
     metadata:
       annotations:
         sidecar.istio.io/inject: "true"
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/api/metrics"
       labels:
         app: service-f
         component: service
