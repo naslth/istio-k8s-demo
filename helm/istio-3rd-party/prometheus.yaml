@@ -7,9 +7,8 @@ metadata:
     app.kubernetes.io/component: server
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/instance: prometheus
-    app.kubernetes.io/version: v2.54.1
-    helm.sh/chart: prometheus-25.27.0
-    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: v3.0.0
+    helm.sh/chart: prometheus-26.0.0
     app.kubernetes.io/part-of: prometheus
   name: prometheus
   namespace: istio-system
@@ -24,9 +23,8 @@ metadata:
     app.kubernetes.io/component: server
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/instance: prometheus
-    app.kubernetes.io/version: v2.54.1
-    helm.sh/chart: prometheus-25.27.0
-    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: v3.0.0
+    helm.sh/chart: prometheus-26.0.0
     app.kubernetes.io/part-of: prometheus
   name: prometheus
   namespace: istio-system
@@ -57,12 +55,6 @@ data:
       - source_labels: [__meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
         action: keep
         regex: istiod;http-monitoring
-      scheme: https
-      tls_config:
-        ca_file: /etc/prom-certs/root-cert.pem
-        cert_file: /etc/prom-certs/cert-chain.pem
-        key_file: /etc/prom-certs/key.pem
-        insecure_skip_verify: true  
     - job_name: 'envoy-stats'
       metrics_path: /stats/prometheus
       kubernetes_sd_configs:
@@ -71,13 +63,7 @@ data:
       relabel_configs:
       - source_labels: [__meta_kubernetes_pod_container_port_name]
         action: keep
-        regex: '.*-envoy-prom'
-      scheme: https
-      tls_config:
-        ca_file: /etc/prom-certs/root-cert.pem
-        cert_file: /etc/prom-certs/cert-chain.pem
-        key_file: /etc/prom-certs/key.pem
-        insecure_skip_verify: true          
+        regex: '.*-envoy-prom' 
     - job_name: prometheus
       static_configs:
       - targets:
@@ -390,9 +376,8 @@ metadata:
     app.kubernetes.io/component: server
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/instance: prometheus
-    app.kubernetes.io/version: v2.54.1
-    helm.sh/chart: prometheus-25.27.0
-    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: v3.0.0
+    helm.sh/chart: prometheus-26.0.0
     app.kubernetes.io/part-of: prometheus
   name: prometheus
 rules:
@@ -431,7 +416,6 @@ rules:
       - watch
   - nonResourceURLs:
       - "/metrics"
-      - "api/metrics"
     verbs:
       - get
 ---
@@ -443,9 +427,8 @@ metadata:
     app.kubernetes.io/component: server
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/instance: prometheus
-    app.kubernetes.io/version: v2.54.1
-    helm.sh/chart: prometheus-25.27.0
-    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: v3.0.0
+    helm.sh/chart: prometheus-26.0.0
     app.kubernetes.io/part-of: prometheus
   name: prometheus
 subjects:
@@ -465,9 +448,8 @@ metadata:
     app.kubernetes.io/component: server
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/instance: prometheus
-    app.kubernetes.io/version: v2.54.1
-    helm.sh/chart: prometheus-25.27.0
-    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: v3.0.0
+    helm.sh/chart: prometheus-26.0.0
     app.kubernetes.io/part-of: prometheus
   name: prometheus
   namespace: istio-system
@@ -492,9 +474,8 @@ metadata:
     app.kubernetes.io/component: server
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/instance: prometheus
-    app.kubernetes.io/version: v2.54.1
-    helm.sh/chart: prometheus-25.27.0
-    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: v3.0.0
+    helm.sh/chart: prometheus-26.0.0
     app.kubernetes.io/part-of: prometheus
   name: prometheus
   namespace: istio-system
@@ -515,24 +496,17 @@ spec:
         app.kubernetes.io/component: server
         app.kubernetes.io/name: prometheus
         app.kubernetes.io/instance: prometheus
-        app.kubernetes.io/version: v2.54.1
-        helm.sh/chart: prometheus-25.27.0
-        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: v3.0.0
+        helm.sh/chart: prometheus-26.0.0
         app.kubernetes.io/part-of: prometheus
-        sidecar.istio.io/inject: "true"
-      annotations:
-        traffic.sidecar.istio.io/includeInboundPorts: ""   # do not intercept any inbound ports
-        traffic.sidecar.istio.io/includeOutboundIPRanges: ""  # do not intercept any outbound traffic
-        proxy.istio.io/config: |  # configure an env variable `OUTPUT_CERTS` to write certificates to the given folder
-          proxyMetadata:
-            OUTPUT_CERTS: /etc/istio-output-certs
-        sidecar.istio.io/userVolumeMount: '[{"name": "istio-certs", "mountPath": "/etc/istio-output-certs"}]' # mount the shared volume at sidecar proxy  
+        
+        sidecar.istio.io/inject: "false"
     spec:
       enableServiceLinks: true
       serviceAccountName: prometheus
       containers:
         - name: prometheus-server-configmap-reload
-          image: "ghcr.io/prometheus-operator/prometheus-config-reloader:v0.76.0"
+          image: "ghcr.io/prometheus-operator/prometheus-config-reloader:v0.78.2"
           imagePullPolicy: "IfNotPresent"
           args:
             - --watched-dir=/etc/config
@@ -558,10 +532,9 @@ spec:
             - name: config-volume
               mountPath: /etc/config
               readOnly: true
-            - name: istio-certs
-              mountPath: /etc/prom-certs
+
         - name: prometheus-server
-          image: "prom/prometheus:v2.54.1"
+          image: "prom/prometheus:v3.0.0"
           imagePullPolicy: "IfNotPresent"
           args:
             - --storage.tsdb.retention.time=15d
@@ -593,8 +566,6 @@ spec:
             failureThreshold: 3
             successThreshold: 1
           volumeMounts:
-            - name: istio-certs
-              mountPath: /etc/prom-certs
             - name: config-volume
               mountPath: /etc/config
             - name: storage-volume
@@ -609,6 +580,3 @@ spec:
         - name: storage-volume
           emptyDir:
             {}
-        - name: istio-certs
-          emptyDir:
-            medium: Memory
