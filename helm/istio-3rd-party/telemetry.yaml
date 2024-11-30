@@ -1,0 +1,14 @@
+apiVersion: telemetry.istio.io/v1
+kind: Telemetry
+metadata:
+  name: mesh-default
+  namespace: istio-system
+spec:
+  # no selector specified, applies to all workloads
+  metrics:
+    - providers:
+      - name: prometheus
+  accessLogging:
+    - providers:
+      - name: envoy
+      - name: otel

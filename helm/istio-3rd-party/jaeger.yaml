@@ -68,11 +68,6 @@ spec:
       port: 80
       protocol: TCP
       targetPort: 16686
-    # Note: Change port name if you add '--query.grpc.tls.enabled=true'
-    - name: grpc-query
-      port: 16685
-      protocol: TCP
-      targetPort: 16685
   selector:
     app: jaeger
 ---

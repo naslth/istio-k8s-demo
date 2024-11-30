@@ -12,8 +12,7 @@ metadata:
     app.kubernetes.io/part-of: prometheus
   name: prometheus
   namespace: istio-system
-  annotations:
-    {}
+  annotations: {}
 ---
 # Source: prometheus/templates/cm.yaml
 apiVersion: v1
@@ -45,6 +44,19 @@ data:
     - /etc/config/rules
     - /etc/config/alerts
     scrape_configs:
+    - job_name: prometheus_promhttp
+      metrics_path: '/api/metrics'
+      scrape_interval: 5s
+      static_configs:
+        - targets: ['service-a.dev:8080','service-b.dev:8080','service-c.dev:8080',
+                    'service-d.dev:8080','service-e.dev:8080','service-f.dev:8080',
+                    'service-g.dev:8080','service-h.dev:8080']
+      scheme: https
+      tls_config:
+        ca_file: /etc/prom-certs/root-cert.pem
+        cert_file: /etc/prom-certs/cert-chain.pem
+        key_file: /etc/prom-certs/key.pem
+        insecure_skip_verify: true
     - job_name: 'istiod'
       kubernetes_sd_configs:
       - role: endpoints
@@ -415,7 +427,8 @@ rules:
       - list
       - watch
   - nonResourceURLs:
-      - "/metrics"
+      - "metrics"
+      - "api/metrics"
     verbs:
       - get
 ---
@@ -499,8 +512,15 @@ spec:
         app.kubernetes.io/version: v3.0.0
         helm.sh/chart: prometheus-26.0.0
         app.kubernetes.io/part-of: prometheus
-        
+
         sidecar.istio.io/inject: "false"
+      annotations:
+        traffic.sidecar.istio.io/includeInboundPorts: ""   # do not intercept any inbound ports
+        traffic.sidecar.istio.io/includeOutboundIPRanges: ""  # do not intercept any outbound traffic
+        proxy.istio.io/config: |  # configure an env variable `OUTPUT_CERTS` to write certificates to the given folder
+          proxyMetadata:
+            OUTPUT_CERTS: /etc/istio-output-certs
+        sidecar.istio.io/userVolumeMount: '[{"name": "istio-certs", "mountPath": "/etc/istio-output-certs"}]' # mount the shared volume at sidecar proxy
     spec:
       enableServiceLinks: true
       serviceAccountName: prometheus
@@ -532,6 +552,8 @@ spec:
             - name: config-volume
               mountPath: /etc/config
               readOnly: true
+            - mountPath: /etc/prom-certs/
+              name: istio-certs
 
         - name: prometheus-server
           image: "prom/prometheus:v3.0.0"
@@ -571,6 +593,8 @@ spec:
             - name: storage-volume
               mountPath: /data
               subPath: ""
+            - mountPath: /etc/prom-certs/
+              name: istio-certs
       dnsPolicy: ClusterFirst
       terminationGracePeriodSeconds: 300
       volumes:
@@ -578,5 +602,7 @@ spec:
           configMap:
             name: prometheus
         - name: storage-volume
-          emptyDir:
-            {}
+          emptyDir: {}
+        - emptyDir:
+            medium: Memory
+          name: istio-certs
