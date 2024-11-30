@@ -95,7 +95,7 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - name: service
+    - name: http-grafana-service
       port: 3000
       protocol: TCP
       targetPort: 3000

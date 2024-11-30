@@ -513,7 +513,7 @@ spec:
         helm.sh/chart: prometheus-26.0.0
         app.kubernetes.io/part-of: prometheus
 
-        sidecar.istio.io/inject: "false"
+        sidecar.istio.io/inject: "true"
       annotations:
         traffic.sidecar.istio.io/includeInboundPorts: ""   # do not intercept any inbound ports
         traffic.sidecar.istio.io/includeOutboundIPRanges: ""  # do not intercept any outbound traffic

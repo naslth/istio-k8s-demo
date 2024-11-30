@@ -68,6 +68,11 @@ spec:
       port: 80
       protocol: TCP
       targetPort: 16686
+    # Note: Change port name if you add '--query.grpc.tls.enabled=true'
+    - name: grpc-query
+      port: 16685
+      protocol: TCP
+      targetPort: 16685
   selector:
     app: jaeger
 ---
@@ -97,11 +102,11 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - name: jaeger-collector-http
+  - name: http-jaeger-collector
     port: 14268
     targetPort: 14268
     protocol: TCP
-  - name: jaeger-collector-grpc
+  - name: grpc-jaeger-collector
     port: 14250
     targetPort: 14250
     protocol: TCP

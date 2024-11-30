@@ -12,3 +12,6 @@ spec:
     - providers:
       - name: envoy
       - name: otel
+  tracing:
+    - providers:
+      - name: jaeger
