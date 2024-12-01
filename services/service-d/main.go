@@ -52,7 +52,7 @@ func GreetingHandler(w http.ResponseWriter, r *http.Request) {
 	greetings = append(greetings, tmpGreeting)
 
 	// Respond with the greeting message
-	err := json.NewEncoder(w).Encode(tmpGreeting)
+	err := json.NewEncoder(w).Encode(greetings)
 	if err != nil {
 		log.Error("Error encoding greeting to JSON:", err)
 	}
@@ -66,6 +66,8 @@ func GreetingHandler(w http.ResponseWriter, r *http.Request) {
 		"x-b3-traceid",
 		"x-ot-span-context",
 		"x-request-id",
+		"traceparent",
+		"tracestate",
 	}
 
 	rabbitHeaders := amqp.Table{}

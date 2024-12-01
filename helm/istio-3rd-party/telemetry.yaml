@@ -11,7 +11,8 @@ spec:
   accessLogging:
     - providers:
       - name: envoy
-      - name: otel
   tracing:
     - providers:
       - name: jaeger
+      randomSamplingPercentage: 100.00
+

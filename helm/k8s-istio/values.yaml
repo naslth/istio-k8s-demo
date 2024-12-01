@@ -4,11 +4,11 @@ image:
 
   tag:
     AngularUI: 1.0.0
-    ServiceA: 1.0.6
-    ServiceB: 1.0.6
+    ServiceA: 1.1.1
+    ServiceB: 1.1.1
     ServiceC: 1.0.9
-    ServiceD: 1.0.9
-    ServiceE: 1.0.6
+    ServiceD: 1.1.2
+    ServiceE: 1.1.1
     ServiceF: 1.0.9
     ServiceG: 1.0.6
     ServiceH: 1.0.6

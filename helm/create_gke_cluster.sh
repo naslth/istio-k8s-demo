@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Constants
+# Biến sử dụng (thay đổi theo config)
 readonly PROJECT="final-thesis-20021354"
 readonly CLUSTER="k8s-istio-cluster"
 readonly ZONE="us-central1"
@@ -8,6 +8,7 @@ readonly GKE_VERSION="1.28.14-gke.1376000"
 readonly MACHINE_TYPE="e2-standard-2"
 readonly SERVICE_ACCOUNT="346848910511-compute@developer.gserviceaccount.com"
 
+# Tạo gcloud clusters
 gcloud beta container \
   --project "${PROJECT}" clusters create "${CLUSTER}" \
   --zone "${ZONE}" \
@@ -51,9 +52,9 @@ gcloud beta container \
   --enable-shielded-nodes \
   --node-locations "us-central1-a","us-central1-b","us-central1-c"
 
-# Get cluster credentials
+# lấy credital cho clusters 
 gcloud container clusters get-credentials "${CLUSTER}" \
   --region "${ZONE}" --project "${PROJECT}"
 
-
+# sử dụng context gcloud cluster cho command kubectl
 kubectl config current-context

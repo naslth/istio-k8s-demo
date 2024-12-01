@@ -107,7 +107,7 @@ data:
       istio:
         root_namespace: istio-system
       tracing:
-        enabled: false
+        enabled: true
     identity:
       cert_file: ""
       private_key_file: ""

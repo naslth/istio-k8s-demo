@@ -96,6 +96,8 @@ func callNextServiceWithTrace(url string, r *http.Request) {
 		"x-b3-traceid",
 		"x-ot-span-context",
 		"x-request-id",
+		"traceparent",
+		"tracestate",
 	}
 
 	for _, header := range incomingHeaders {
