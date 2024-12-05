@@ -41,6 +41,14 @@ data:
     provisioning = /etc/grafana/provisioning
     [server]
     domain = ''
+    [smtp]
+    enabled = true
+    host = smtp.gmail.com:587
+    user = hieu.lt21.work@gmail.com
+    password = naslth90.1555
+    from_address = naslth-grafana-alerts@gmail.com
+    from_name = Naslth Grafana Alerts
+    skip_verify = true
   datasources.yaml: |
     apiVersion: 1
     datasources:

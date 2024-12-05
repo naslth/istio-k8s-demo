@@ -12,7 +12,8 @@ spec:
     - providers:
       - name: envoy
   tracing:
-    - providers:
-      - name: jaeger
-      randomSamplingPercentage: 100.00
+  - providers:
+    - name: zipkin
+    randomSamplingPercentage: 100.00
+      
 

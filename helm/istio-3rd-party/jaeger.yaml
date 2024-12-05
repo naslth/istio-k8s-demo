@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: jaeger
-          image: "docker.io/jaegertracing/all-in-one:1.63.0"
+          image: "docker.io/jaegertracing/all-in-one:1.58"
           env:
             - name: BADGER_EPHEMERAL
               value: "false"
@@ -30,6 +30,8 @@ spec:
               value: "/badger/data"
             - name: BADGER_DIRECTORY_KEY
               value: "/badger/key"
+            - name: COLLECTOR_ZIPKIN_HOST_PORT
+              value: ":9411"
             - name: MEMORY_MAX_TRACES
               value: "50000"
             - name: QUERY_BASE_PATH
@@ -66,6 +68,27 @@ spec:
       port: 80
       protocol: TCP
       targetPort: 16686
+    # Note: Change port name if you add '--query.grpc.tls.enabled=true'
+    - name: grpc-query
+      port: 16685
+      protocol: TCP
+      targetPort: 16685
+  selector:
+    app: jaeger
+---
+# Jaeger implements the Zipkin API. To support swapping out the tracing backend, we use a Service named Zipkin.
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: zipkin
+  name: zipkin
+  namespace: istio-system
+spec:
+  ports:
+    - port: 9411
+      targetPort: 9411
+      name: http-query
   selector:
     app: jaeger
 ---
@@ -79,10 +102,19 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - name: http-jaeger-collector
+  - name: jaeger-collector-http
     port: 14268
     targetPort: 14268
     protocol: TCP
+  - name: jaeger-collector-grpc
+    port: 14250
+    targetPort: 14250
+    protocol: TCP
+  - port: 9411
+    targetPort: 9411
+    name: http-zipkin
+  - port: 4317
+    name: grpc-otel
   - port: 4318
     name: http-otel
   selector:

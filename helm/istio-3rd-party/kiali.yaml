@@ -14,7 +14,6 @@ metadata:
     app.kubernetes.io/version: "v2.0.0"
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: "kiali"
-...
 ---
 # Source: kiali-server/templates/configmap.yaml
 apiVersion: v1
@@ -126,7 +125,6 @@ data:
           port: 9090
       port: 20001
       web_root: /kiali
-...
 ---
 # Source: kiali-server/templates/role.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -240,7 +238,6 @@ rules:
   - get
   - list
   - watch
-...
 ---
 # Source: kiali-server/templates/rolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -264,7 +261,6 @@ subjects:
 - kind: ServiceAccount
   name: kiali
   namespace: "istio-system"
-...
 ---
 # Source: kiali-server/templates/service.yaml
 apiVersion: v1
@@ -295,7 +291,6 @@ spec:
   selector:
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali
-...
 ---
 # Source: kiali-server/templates/deployment.yaml
 apiVersion: apps/v1
@@ -422,4 +417,4 @@ spec:
         configMap:
           name: kiali-cabundle
           optional: true
-...
+

@@ -71,7 +71,6 @@ data:
       metrics_path: /stats/prometheus
       kubernetes_sd_configs:
       - role: pod
-
       relabel_configs:
       - source_labels: [__meta_kubernetes_pod_container_port_name]
         action: keep
@@ -512,15 +511,15 @@ spec:
         app.kubernetes.io/version: v3.0.0
         helm.sh/chart: prometheus-26.0.0
         app.kubernetes.io/part-of: prometheus
-
+        # bật inject sidecar proxy
         sidecar.istio.io/inject: "true"
       annotations:
-        traffic.sidecar.istio.io/includeInboundPorts: ""   # do not intercept any inbound ports
-        traffic.sidecar.istio.io/includeOutboundIPRanges: ""  # do not intercept any outbound traffic
-        proxy.istio.io/config: |  # configure an env variable `OUTPUT_CERTS` to write certificates to the given folder
+        traffic.sidecar.istio.io/includeInboundPorts: ""   # Không chặn các traffic đi vào
+        traffic.sidecar.istio.io/includeOutboundIPRanges: ""  # Không chặn các traffic đi ra
+        proxy.istio.io/config: |  # tạo env để add certificate vào thư mục mong muốn
           proxyMetadata:
             OUTPUT_CERTS: /etc/istio-output-certs
-        sidecar.istio.io/userVolumeMount: '[{"name": "istio-certs", "mountPath": "/etc/istio-output-certs"}]' # mount the shared volume at sidecar proxy
+        sidecar.istio.io/userVolumeMount: '[{"name": "istio-certs", "mountPath": "/etc/istio-output-certs"}]' # gán thư mục chứa cert để share cert từ sidecar
     spec:
       enableServiceLinks: true
       serviceAccountName: prometheus
