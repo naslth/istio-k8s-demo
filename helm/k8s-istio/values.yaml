@@ -15,13 +15,13 @@ image:
 
 autoscaling:
   minReplicas: 1
-  maxReplicas: 3
+  maxReplicas: 7
 
   metrics:
     memory:
-      averageUtilization: 75
+      averageUtilization: 50
     cpu:
-      averageUtilization: 75
+      averageUtilization: 50
 
 secrets:
   data:

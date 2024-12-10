@@ -2,5 +2,5 @@ apiVersion: v2
 name: k8s-istio
 description: Reference application platform, written in Go and TypeScript/Angular.
 type: application
-version: 1.0.5
-appVersion: "1.1.0"
+version: 1.0.6
+appVersion: "1.1.1"

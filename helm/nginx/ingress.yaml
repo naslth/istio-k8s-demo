@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: naslth-ingress
+  namespace: dev
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    kubernetes.io/ingress.class: "nginx" 
+spec:
+  ingressClassName: nginx  
+  tls:
+  - hosts:
+    - naslth.myddns.me
+    secretName: naslth-credential
+  rules:
+  - host: naslth.myddns.me
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: angular-ui
+            port:
+              number: 80
+      - path: /api/greeting
+        pathType: Prefix
+        backend:
+          service:
+            name: service-a
+            port:
+              number: 8080

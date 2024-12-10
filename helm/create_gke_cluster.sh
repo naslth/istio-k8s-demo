@@ -5,10 +5,10 @@ readonly PROJECT="final-thesis-20021354"
 readonly CLUSTER="k8s-istio-cluster"
 readonly ZONE="us-central1"
 readonly GKE_VERSION="1.28.14-gke.1376000"
-readonly MACHINE_TYPE="e2-standard-2"
+readonly MACHINE_TYPE="e2-highmem-2"
 readonly SERVICE_ACCOUNT="346848910511-compute@developer.gserviceaccount.com"
 
-# Tạo gcloud clusters
+Tạo gcloud clusters
 gcloud beta container \
   --project "${PROJECT}" clusters create "${CLUSTER}" \
   --zone "${ZONE}" \
@@ -41,7 +41,7 @@ gcloud beta container \
   --max-unavailable-upgrade 0 \
   --enable-autoprovisioning \
   --min-cpu 1 --max-cpu 2 \
-  --min-memory 4 --max-memory 4 \
+  --min-memory 4 --max-memory 16 \
   --autoprovisioning-locations=us-central1-a,us-central1-b,us-central1-c \
   --autoprovisioning-service-account=${SERVICE_ACCOUNT} \
   --enable-autoprovisioning-autorepair \
